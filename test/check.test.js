@@ -221,6 +221,7 @@ describe("GitHub Actions", () => {
       // 0.25 GB-month accrued by the 10th: on course for about 0.8 by the month's end.
       "github.storage:projected",
     ]);
+    expect(result.githubBreakdown).toContainEqual({ sku: "actions_linux", unit: "Minutes", repos: "public", quantity: 5000, grossAmount: 30 });
     const cached = await env.DB.prepare("SELECT name, public FROM repo_visibility ORDER BY name").all();
     expect(cached.results).toEqual([{ name: "me/open-source", public: 1 }, { name: "me/private-app", public: 0 }]);
   });

@@ -115,7 +115,12 @@ Each product's block is queried separately in the same request with GraphQL alia
 - **With your real account (free):** create an `Account Analytics: Read` token, run `wrangler dev`, and hit the check route. That confirms the real dataset and field names (including R2 and Workers AI) before release. It needs the token from you.
 - **Not tested:** Workers Paid billing-day behaviour against a real Paid account (it costs $5 a month), and GitHub billing for organisations.
 
-## Open questions
+## Open questions (resolved 2026-11-10 by the live check)
+
+- All datasets and fields, including R2's (`r2OperationsAdaptiveGroups`, `r2StorageAdaptiveGroups`), Workers AI's (`aiInferenceAdaptiveGroups.totalNeurons`) and Durable Objects duration (`durableObjectsPeriodicGroups.activeTime`), exist in the live schema.
+- GitHub's usage report does list public-repo runner usage (with gross amounts); the guard leaves it out. SKUs are display names ("Actions Linux", "Actions storage"), not the docs' `actions_linux`; nothing depended on them.
+
+## Open questions (original)
 
 - The R2 and Workers AI dataset names. Resolved during the build by checking the live schema with your token.
 - Whether GitHub's usage report lists public-repo runner usage at all (its docs don't say). It doesn't matter for correctness, since public items are filtered out either way, but it's worth seeing in your real data during the build.

@@ -133,12 +133,22 @@ export async function readGithub(env, config, limits, now, fetchImpl = fetch) {
 
     let compute = 0;
     let gbHours = 0;
+    // Where the numbers come from, per SKU, counted (private) or not (public):
+    // shown in the check result so anyone can see what was included.
+    const breakdown = new Map();
     for (const i of inPeriod) {
       out.charged += Number(i.netAmount) || 0;
-      if (!counts(i)) continue;
+      const counted = counts(i);
+      const key = `${i.sku ?? "?"}|${i.unitType ?? "?"}|${counted ? "counted" : "public, free"}`;
+      const b = breakdown.get(key) ?? { sku: i.sku ?? "?", unit: i.unitType ?? "?", repos: counted ? "private" : "public", quantity: 0, grossAmount: 0 };
+      b.quantity += Number(i.quantity) || 0;
+      b.grossAmount += Number(i.grossAmount) || 0;
+      breakdown.set(key, b);
+      if (!counted) continue;
       if (isMinutes(i)) compute += Number(i.grossAmount) || 0;
       else if (isStorage(i)) gbHours += Number(i.quantity) || 0;
     }
+    out.breakdown = [...breakdown.values()].map((b) => ({ ...b, quantity: Math.round(b.quantity * 1000) / 1000, grossAmount: Math.round(b.grossAmount * 100) / 100 }));
     const hoursInPeriod = (period.end.getTime() - period.start.getTime()) / 36e5;
     out.values["github.compute"] = compute;
     out.values["github.storage"] = gbHours / hoursInPeriod;

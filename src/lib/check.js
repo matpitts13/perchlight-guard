@@ -174,6 +174,7 @@ export async function runCheck(env, { now = new Date(), fetchImpl = fetch, send 
     fatal,
     failures: streaks,
     datasets: cf.datasets,
+    githubBreakdown: gh.breakdown ?? [],
     alertsSent: sent.map((s) => ({ limitId: s.limitId, kind: s.kind })),
     delivery,
   };

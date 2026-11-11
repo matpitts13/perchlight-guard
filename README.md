@@ -133,7 +133,7 @@ A bad setting never stops the guard: it uses the default for that one and lists 
   - email that fails, then sends on a later check, and claims left by a check that died
   - webhooks, the daily summary, and GitHub's public and private repos and charges
   - the status page and its password
-- **Before each release, against a real account (free):** the dataset and field names are checked against Cloudflare's live schema with a real token. Names Cloudflare doesn't document (R2, Workers AI, Durable Objects duration) are marked in [`src/lib/cloudflare.js`](src/lib/cloudflare.js).
+- **Against a real account (free), on 2026-11-10:** every Cloudflare dataset and field was confirmed against the live schema, including the ones Cloudflare doesn't document (R2, Workers AI, Durable Objects duration; marked in [`src/lib/cloudflare.js`](src/lib/cloudflare.js)). GitHub's real report was read too: it does list public repos' usage (which the guard leaves out), and every check result includes a per-runner breakdown (`githubBreakdown`) showing what was counted.
 - **Not tested, because it costs money:** the Workers Paid plan's billing-day behavior against a real Paid account ($5 a month), and GitHub organization billing.
 
 ## License

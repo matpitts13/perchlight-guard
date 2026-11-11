@@ -40,8 +40,9 @@ const sum = (rows, read) => rows.reduce((n, r) => n + (Number(read(r)) || 0), 0)
 
 /**
  * The blocks. `limits` are the limit ids a block answers; `filter` is
- * "date" (YYYY-MM-DD) or "datetime" (ISO). Field names marked "unverified"
- * weren't in Cloudflare's docs; the live check confirms them.
+ * "date" (YYYY-MM-DD) or "datetime" (ISO). Every dataset and field here was
+ * checked against a real account's live schema on 2026-11-10, including the
+ * ones Cloudflare's docs don't describe (marked below).
  */
 export const BLOCKS = [
   {
@@ -96,7 +97,7 @@ export const BLOCKS = [
     parse: (rows) => ({ "do.requests": sum(rows, (r) => r.sum?.requests) }),
   },
   {
-    // unverified: activeTime (microseconds); billed duration is active
+    // Not in Cloudflare's docs; confirmed live 2026-11-10. activeTime (microseconds); billed duration is active
     // wall-clock time at 128 MB, so GB-s = seconds x 0.125.
     alias: "doDuration",
     dataset: "durableObjectsPeriodicGroups",
@@ -114,7 +115,7 @@ export const BLOCKS = [
     parse: (rows) => ({ "do.storage": latestPerEntity(rows, "_none", (r) => Number(r.max?.storedBytes) || 0) }),
   },
   {
-    // unverified
+    // Not in Cloudflare's docs; confirmed against a real account's live schema on 2026-11-10.
     alias: "r2Ops",
     dataset: "r2OperationsAdaptiveGroups",
     limits: ["r2.classA", "r2.classB"],
@@ -134,7 +135,7 @@ export const BLOCKS = [
     },
   },
   {
-    // unverified
+    // Not in Cloudflare's docs; confirmed against a real account's live schema on 2026-11-10.
     alias: "r2Storage",
     dataset: "r2StorageAdaptiveGroups",
     limits: ["r2.storage"],
@@ -145,7 +146,7 @@ export const BLOCKS = [
     }),
   },
   {
-    // unverified
+    // Not in Cloudflare's docs; confirmed against a real account's live schema on 2026-11-10.
     alias: "ai",
     dataset: "aiInferenceAdaptiveGroups",
     limits: ["ai.neurons"],
