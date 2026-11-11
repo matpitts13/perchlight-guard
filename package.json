@@ -1,0 +1,37 @@
+{
+  "name": "perchlight-guard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A free, self-hosted Cloudflare Worker that warns you before you hit a Cloudflare free-plan (or Workers Paid) limit, or GitHub Actions' free allowance.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --test-scheduled",
+    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
+    "test": "vitest run"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "cloudflare": {
+    "bindings": {
+      "CF_API_TOKEN": {
+        "description": "Required. A Cloudflare API token with **Account > Account Analytics > Read** only (dashboard > My Profile > API Tokens > Create Token > Custom). Read-only: it can't change anything."
+      },
+      "STATUS_PASSWORD": {
+        "description": "Required. A password (12+ characters) for the status page at `/`. Any user name works."
+      },
+      "WEBHOOK_URL": {
+        "description": "Optional. A Discord, Slack or ntfy webhook URL for alerts (set WEBHOOK_FORMAT to match). Leave empty for email only."
+      },
+      "GITHUB_TOKEN": {
+        "description": "Optional. A **classic** GitHub personal access token with the `user` scope, to watch GitHub Actions usage (set GITHUB_USER too). Leave empty to skip GitHub."
+      }
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "^1.6.1",
+    "vitest": "^5.1.0",
+    "wrangler": "^4.159.0"
+  }
+}

@@ -1,0 +1,14 @@
+# Copy to .dev.vars for local development (`npm run dev`). Never commit .dev.vars.
+# In production, set each one with:  npx wrangler secret put <NAME>
+
+# A Cloudflare API token with Account > Account Analytics > Read (read-only).
+CF_API_TOKEN=
+
+# Password for the status page at / (12+ characters; any user name).
+STATUS_PASSWORD=
+
+# Optional: a Discord / Slack / ntfy webhook URL.
+WEBHOOK_URL=
+
+# Optional: a classic GitHub personal access token with the "user" scope.
+GITHUB_TOKEN=

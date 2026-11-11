@@ -1,0 +1,46 @@
+{
+  "$schema": "https://perchlight.ravenburst.com/schema/v1.json",
+  "version": 1,
+  "views": [
+    {
+      "id": "guard-usage",
+      "title": "Usage history",
+      "source": { "type": "d1", "database": "YOUR-D1-DATABASE-ID", "table": "samples" },
+      "columns": [
+        { "label": "Taken", "from": "taken_at", "type": "date" },
+        { "label": "Limit", "from": "limit_id" },
+        { "label": "Period", "from": "period_start" },
+        { "label": "Used", "from": "used", "type": "number" },
+        { "label": "Limit value", "from": "limit_value", "type": "number" },
+        { "label": "Status", "from": "status", "type": "enum", "options": ["ok", "unreadable"] },
+        { "label": "Error", "from": "error", "hidden": true }
+      ]
+    },
+    {
+      "id": "guard-alerts",
+      "title": "Alerts sent",
+      "source": { "type": "d1", "database": "YOUR-D1-DATABASE-ID", "table": "alerts" },
+      "columns": [
+        { "label": "Sent", "from": "sent_at", "type": "date" },
+        { "label": "Limit", "from": "limit_id" },
+        { "label": "Period", "from": "period_start" },
+        { "label": "Kind", "from": "kind" },
+        { "label": "Channels", "from": "channels" },
+        { "label": "Problems", "from": "error" },
+        { "label": "Message", "from": "message", "hidden": true }
+      ],
+      "actions": [{ "label": "Allow again", "confirm": true, "delete": true }]
+    },
+    {
+      "id": "guard-datasets",
+      "title": "What the guard can read",
+      "source": { "type": "d1", "database": "YOUR-D1-DATABASE-ID", "table": "datasets" },
+      "columns": [
+        { "label": "Dataset", "from": "name" },
+        { "label": "Offered", "from": "available", "type": "boolean" },
+        { "label": "Checked", "from": "checked_at", "type": "date" },
+        { "label": "Problem", "from": "last_error" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+// perchlight-guard: an hourly Worker that warns you before you hit a usage limit.
+// Secrets are never set here. Locally they go in .dev.vars (see .dev.vars.example);
+// in production: npx wrangler secret put <NAME>
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "perchlight-guard",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+
+  "d1_databases": [
+    { "binding": "DB", "database_name": "perchlight-guard", "migrations_dir": "migrations" }
+  ],
+
+  // Email to your own verified address (Email Routing > Destination
+  // addresses). Cloudflare: sends to verified destinations are always free.
+  "send_email": [{ "name": "EMAIL" }],
+
+  // Every hour, at 7 minutes past (so it doesn't land with everyone's :00 jobs).
+  // The free plan allows 5 cron triggers per account; this uses 1.
+  "triggers": { "crons": ["7 * * * *"] },
+
+  "vars": {
+    // Your Cloudflare account id (dashboard > any domain > Overview, or `npx wrangler whoami`).
+    "CF_ACCOUNT_ID": "",
+    // "free", or "paid" for Workers Paid (warns before overage instead).
+    "PLAN": "free",
+    // Paid plan: the day of the month your billing renews (1-31).
+    "BILLING_DAY": "1",
+    // Percentages that send a warning, once each per period.
+    "THRESHOLDS": "80,100",
+    // Email: TO must be a verified destination address in Email Routing;
+    // FROM must be an address on a domain with Email Routing on.
+    "ALERT_EMAIL_TO": "",
+    "ALERT_EMAIL_FROM": "",
+    // A webhook as well, or instead (set WEBHOOK_URL as a secret):
+    // "discord", "slack", "ntfy" or "json".
+    "WEBHOOK_FORMAT": "json",
+    // "true": one email a day at SUMMARY_HOUR (UTC) with every limit.
+    "DAILY_SUMMARY": "false",
+    "SUMMARY_HOUR": "8",
+    // GitHub Actions: your GitHub user name (and the GITHUB_TOKEN secret).
+    "GITHUB_USER": "",
+    "GITHUB_BILLING_DAY": "1",
+    // Change or turn off limits, as JSON, e.g.
+    // {"d1.rowsWritten": {"limit": 50000}, "kv.lists": false, "workers.requests": {"thresholds": [50, 90]}}
+    "LIMITS": ""
+  }
+}
