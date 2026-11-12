@@ -61,16 +61,34 @@ async function sendEmail(env, email, subject, text) {
   await env.EMAIL.send(new EmailMessage(addressOnly(email.from), addressOnly(email.to), raw));
 }
 
-function webhookRequest(webhook, subject, text, urgent) {
+const slackEscape = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** Cuts to at most maxBytes of UTF-8 without splitting a character. */
+export function cutBytes(s, maxBytes) {
+  const enc = new TextEncoder();
+  if (enc.encode(s).length <= maxBytes) return s;
+  let out = "";
+  let used = 0;
+  for (const ch of s) {
+    const n = enc.encode(ch).length;
+    if (used + n > maxBytes) break;
+    out += ch;
+    used += n;
+  }
+  return out;
+}
+
+export function webhookRequest(webhook, subject, text, urgent) {
   switch (webhook.format) {
     case "discord":
-      return { body: JSON.stringify({ content: `**${subject}**\n${text}`.slice(0, 2000) }), headers: { "Content-Type": "application/json" } };
+      // Mentions off: alert text includes names and errors from APIs, never ping a channel.
+      return { body: JSON.stringify({ content: `**${subject}**\n${text}`.slice(0, 2000), allowed_mentions: { parse: [] } }), headers: { "Content-Type": "application/json" } };
     case "slack":
-      return { body: JSON.stringify({ text: `*${subject}*\n${text}`.slice(0, 39000) }), headers: { "Content-Type": "application/json" } };
+      return { body: JSON.stringify({ text: slackEscape(`*${subject}*\n${text}`).slice(0, 39000) }), headers: { "Content-Type": "application/json" } };
     case "ntfy":
       return {
         // ntfy turns bodies over 4,096 bytes into attachments; headers must be Latin-1.
-        body: new TextEncoder().encode(text).length > 4000 ? `${text.slice(0, 3900)}\n...` : text,
+        body: new TextEncoder().encode(text).length > 4000 ? `${cutBytes(text, 3900)}\n...` : text,
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
           Title: subject.replace(/[^\x20-\x7e]/g, "?").slice(0, 120),

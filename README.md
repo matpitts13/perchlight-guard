@@ -50,15 +50,15 @@ Nothing, on the free plan. It uses about 24 Worker requests a day (0.02% of the 
 
 ### 1. Make a read-only API token
 
-Cloudflare dashboard → **My Profile** → **API Tokens** → **Create Token** → **Custom token**:
-- Permissions: **Account** → **Account Analytics** → **Read**. Nothing else.
+Cloudflare dashboard â†’ **My Profile** â†’ **API Tokens** â†’ **Create Token** â†’ **Custom token**:
+- Permissions: **Account** â†’ **Account Analytics** â†’ **Read**. Nothing else.
 - Account resources: your account.
 
 It can read usage numbers and nothing else; it can't change anything.
 
 ### 2. Email (recommended)
 
-You need Email Routing on one of your domains (Cloudflare dashboard → your domain → **Email** → **Email Routing**), and your own address added under **Destination addresses** and verified. Alerts are sent from an address on that domain to that verified address.
+You need Email Routing on one of your domains (Cloudflare dashboard â†’ your domain â†’ **Email** â†’ **Email Routing**), and your own address added under **Destination addresses** and verified. Alerts are sent from an address on that domain to that verified address.
 
 ### 3. Deploy
 
@@ -88,7 +88,7 @@ The first sends a sample alert through every channel and says which worked. The 
 
 ## GitHub Actions (optional)
 
-1. Create a **classic** personal access token (github.com/settings/tokens → **Generate new token (classic)**) with only the **`user`** scope. GitHub's billing usage API doesn't accept fine-grained tokens.
+1. Create a **classic** personal access token (github.com/settings/tokens â†’ **Generate new token (classic)**) with only the **`user`** scope. GitHub's billing usage API doesn't accept fine-grained tokens.
 2. Set `GITHUB_USER` in `wrangler.jsonc`, and `npx wrangler secret put GITHUB_TOKEN`.
 
 Only private repos count: standard GitHub-hosted runners are free in public repos, and don't use your allowance. The guard checks each repo's visibility once a day; anything it can't confirm is public counts, to be safe. GitHub's own emails come at 90% and 100% and, by GitHub's docs, aren't always available for personal accounts; this adds 80%, the early warning and webhooks. A **$0 Actions budget** (github.com/settings/billing) is still the real stop: this only warns.
@@ -125,7 +125,7 @@ A bad setting never stops the guard: it uses the default for that one and lists 
 
 ## Tested, and not tested
 
-- `npm test`: 41 tests, against a fake Cloudflare analytics API, a fake GitHub and a fake mail sender. They cover:
+- `npm test`: 43 tests, against a fake Cloudflare analytics API, a fake GitHub and a fake mail sender. They cover:
   - thresholds and once-per-period, including two checks at once
   - early warnings, storage caps re-arming (with hysteresis), "no data"
   - the 3-strikes "can't read" alert per source, including an expired GitHub token and HTTP 200 with errors

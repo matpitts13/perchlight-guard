@@ -3,7 +3,7 @@ import { readConfig } from "../src/lib/config.js";
 import { periodFor } from "../src/lib/periods.js";
 import { buildReadings, candidates, capsToRearm } from "../src/lib/evaluate.js";
 import { formatValue } from "../src/lib/limits.js";
-import { mime } from "../src/lib/channels.js";
+import { mime, webhookRequest, cutBytes } from "../src/lib/channels.js";
 
 const base = { CF_ACCOUNT_ID: "a", CF_API_TOKEN: "t", ALERT_EMAIL_TO: "me@x.test", ALERT_EMAIL_FROM: "g@x.test" };
 
@@ -126,11 +126,26 @@ describe("evaluating", () => {
 
 describe("email", () => {
   it("builds a valid plain-text MIME message, encoding a non-ASCII subject", () => {
-    const raw = mime({ from: "Guard <g@x.test>", to: "me@x.test", subject: "Usage — warning\r\nBcc: evil@x.test", text: "Hello\nThere" });
+    const raw = mime({ from: "Guard <g@x.test>", to: "me@x.test", subject: "Usage â€” warning\r\nBcc: evil@x.test", text: "Hello\nThere" });
     expect(raw).toMatch(/^From: Guard <g@x\.test>\r\nTo: me@x\.test\r\nSubject: =\?UTF-8\?B\?/);
     expect(raw).not.toMatch(/\r\nBcc:/);
     expect(raw).toMatch(/Message-ID: <[0-9a-f-]+@x\.test>/);
     const body = raw.split("\r\n\r\n")[1].replace(/\r\n/g, "");
     expect(new TextDecoder().decode(Uint8Array.from(atob(body), (c) => c.charCodeAt(0)))).toBe("Hello\r\nThere");
+  });
+});
+
+describe("webhooks", () => {
+  it("never lets alert text ping a Discord or Slack channel", () => {
+    const d = JSON.parse(webhookRequest({ format: "discord" }, "s", "@everyone", false).body);
+    expect(d.allowed_mentions).toEqual({ parse: [] });
+    const s = JSON.parse(webhookRequest({ format: "slack" }, "s", "<!channel> a & b", false).body);
+    expect(s.text).toContain("&lt;!channel&gt; a &amp; b");
+  });
+  it("cuts ntfy bodies by bytes without splitting a character", () => {
+    const body = webhookRequest({ format: "ntfy" }, "s", "é".repeat(3000), false).body;
+    expect(new TextEncoder().encode(body).length).toBeLessThanOrEqual(4000);
+    expect(body).not.toContain("�");
+    expect(cutBytes("aé", 2)).toBe("a");
   });
 });
